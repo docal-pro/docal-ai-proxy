@@ -1,0 +1,15 @@
+{
+  "name": "docal-ai-proxy",
+  "version": "0.0.1",
+  "description": "DOCAL AI Proxy",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "proxy-start": "wrangler dev",
+    "proxy-build": "wrangler build",
+    "proxy-deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^3.109.2"
+  }
+}
