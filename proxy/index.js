@@ -75,15 +75,24 @@ export default {
 
       let responseData;
       const responseText = await response.text();
-      console.log(
-        "ℹ️  Server response:\n",
-        JSON.parse(responseText.replace(/\\n/g, "\\n ")).result
-      ); // Pretty print debug log
 
+      // Try to parse as JSON, but handle non-JSON responses gracefully
       try {
         responseData = JSON.parse(responseText);
+        console.log(
+          "ℹ️  Server response:\n",
+          responseData.result
+            ? responseData.result.replace(/\\n/g, "\n ")
+            : responseData
+        );
       } catch (e) {
-        responseData = responseText;
+        // Handle non-JSON response
+        console.error("❌ Bad response received:", responseText);
+        responseData = {
+          error: "Invalid server response",
+          details: responseText,
+          status: response.status,
+        };
       }
 
       // Forward the actual server status code and response
@@ -93,25 +102,31 @@ export default {
         ...corsHeaders,
       });
 
-      return new Response(
-        typeof responseData === "string"
-          ? responseData
-          : JSON.stringify(responseData, null, 2), // Pretty print response
-        {
-          status: response.status,
-          headers: modifiedHeaders,
-        }
-      );
+      return new Response(JSON.stringify(responseData, null, 2), {
+        // If we got an error response, use 502 Bad Gateway
+        status: response.ok ? response.status : 502,
+        headers: modifiedHeaders,
+      });
     } catch (err) {
-      console.error("❌ Proxy error:", err.message, err.stack); // Debug log
+      console.error("❌ Proxy error:", err.message); // Debug log
+
+      // Check for specific connection errors
+      const errorMessage = err.message.includes("error code: 1003")
+        ? "Unable to connect to server. Please ensure the server is accessible from Cloudflare Workers."
+        : err.message;
+
       return new Response(
-        JSON.stringify({
-          error: err.message,
-          stack: err.stack,
-          message: "Proxy server error",
-        }),
+        JSON.stringify(
+          {
+            error: errorMessage,
+            details: err.stack,
+            message: "Proxy server error",
+          },
+          null,
+          2
+        ),
         {
-          status: 500,
+          status: 502, // Use 502 Bad Gateway for connection issues
           headers: {
             "Content-Type": "application/json",
             ...getCorsHeaders(request),
