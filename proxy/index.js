@@ -1,7 +1,10 @@
 export default {
   async fetch(request, env) {
     // Define the list of allowed origins
-    const allowedOrigins = ["https://docal.ai", "http://localhost:3000"];
+    const allowedOrigins = [
+      "https://ai.docal.pro", // Production domain
+      "http://localhost:3000", // Local Development
+    ];
 
     // Function to check if the origin is allowed
     function isOriginAllowed(origin) {
