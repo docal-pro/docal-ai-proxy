@@ -55,6 +55,9 @@ export default {
       const fetchOptions = {
         method: request.method,
         headers: headers,
+        cf: {
+          insecureSkipVerify: true,
+        },
       };
 
       // Handle POST request body
