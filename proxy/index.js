@@ -39,12 +39,11 @@ export default {
 
       // Add validation
       if (!type || !path) {
-        throw new Error("Invalid URL format. Expected /{type}/{path}");
+        throw new Error("❌ Invalid URL format. Expected /{type}/{path}");
       }
 
-      const serverUrl = `${env.SERVER_URL}:${
-        type === "twitter" ? env.SERVER_PORT_TWITTER : env.SERVER_PORT_DISCOURSE
-      }/${path}`;
+      const serverUrl = `${env.SERVER_URL}:${type === "twitter" ? env.SERVER_PORT_TWITTER : env.SERVER_PORT_DISCOURSE
+        }/${path}`;
 
       console.log("ℹ️  Attempting to forward to:", serverUrl); // Debug log
 
@@ -55,10 +54,13 @@ export default {
       const fetchOptions = {
         method: request.method,
         headers: headers,
-        cf: {
-          insecureSkipVerify: true,
-        },
       };
+
+      // Handle GET request body, if requested with a query
+      const query = url.pathname.split("/")[3]; // Extract query parameter
+      if (request.method === "GET" && query) {
+        fetchOptions.body = JSON.stringify({ query });
+      }
 
       // Handle POST request body
       if (request.method === "POST") {

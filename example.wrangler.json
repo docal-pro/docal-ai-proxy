@@ -11,7 +11,7 @@
 	},
 	"vars": {
 		"SERVER_URL": "https://store.docal.pro",
-		"SERVER_PORT_TWITTER": "3030",
-		"SERVER_PORT_DISCOURSE": "3031"
+		"SERVER_PORT_TWITTER": "3035",
+		"SERVER_PORT_DISCOURSE": "3034"
 	}
 }
